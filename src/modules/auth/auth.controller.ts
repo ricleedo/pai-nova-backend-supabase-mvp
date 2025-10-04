@@ -1,0 +1,69 @@
+import { Request, Response } from 'express';
+import authService from './auth.service';
+import { asyncHandler } from '../../middleware/errorHandler';
+
+export class AuthController {
+  register = asyncHandler(async (req: Request, res: Response) => {
+    const result = await authService.register(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      data: result
+    });
+  });
+
+  login = asyncHandler(async (req: Request, res: Response) => {
+    const result = await authService.login(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: result
+    });
+  });
+
+  refreshToken = asyncHandler(async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+    const result = await authService.refreshToken(refreshToken);
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: result
+    });
+  });
+
+  sendMagicLink = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const result = await authService.generateMagicLink(email);
+
+    res.status(200).json({
+      success: true,
+      message: 'Magic link sent to email',
+      data: result
+    });
+  });
+
+  verifyMagicLink = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.body;
+    const result = await authService.verifyMagicLink(token);
+
+    res.status(200).json({
+      success: true,
+      message: 'Magic link verified successfully',
+      data: result
+    });
+  });
+
+  getProfile = asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    res.status(200).json({
+      success: true,
+      data: { user }
+    });
+  });
+}
+
+export default new AuthController();
