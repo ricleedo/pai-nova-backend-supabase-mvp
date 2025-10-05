@@ -1,0 +1,34 @@
+{"level":"info","message":"Server is running on port 3000","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Environment: development","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"API Version: v1","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Starting scheduler service","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Scheduled reminder check job (every 5 minutes)","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Scheduled missed dose check job (every hour)","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Scheduled daily alert generation (midnight)","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Scheduler service started","service":"pai-care-api","timestamp":"2025-10-05 10:29:02"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:30:00"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:30:01"}
+{"level":"error","message":"400 - Validation error: body.password: Required, body.role: Required, body.name: Required - /api/v1/auth/register - POST - ::1","service":"pai-care-api","timestamp":"2025-10-05 10:31:56"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:35:00"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:35:01"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:40:00"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:40:01"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:45:00"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:45:00"}
+{"level":"error","message":"400 - Validation error: body.password: Required, body.role: Required, body.name: Required - /api/v1/auth/register - POST - ::1","service":"pai-care-api","timestamp":"2025-10-05 10:48:43"}
+{"level":"info","message":"Server is running on port 3000","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Environment: development","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"API Version: v1","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Starting scheduler service","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Scheduled reminder check job (every 5 minutes)","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Scheduled missed dose check job (every hour)","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Scheduled daily alert generation (midnight)","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Scheduler service started","service":"pai-care-api","timestamp":"2025-10-05 10:49:54"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:50:00"}
+{"level":"info","message":"Processed 0 reminders","service":"pai-care-api","timestamp":"2025-10-05 10:50:00"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 10:55:00"}
+{"level":"info","message":"Processed 0 reminders","service":"pai-care-api","timestamp":"2025-10-05 10:55:00"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-05 11:00:00"}
+{"level":"info","message":"Checking for missed doses...","service":"pai-care-api","timestamp":"2025-10-05 11:00:00"}
+{"level":"info","message":"Processed 0 reminders","service":"pai-care-api","timestamp":"2025-10-05 11:00:00"}
+{"level":"info","message":"Found 0 missed doses","service":"pai-care-api","timestamp":"2025-10-05 11:00:00"}

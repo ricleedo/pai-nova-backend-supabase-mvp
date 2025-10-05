@@ -1,0 +1,6 @@
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:30:01"}
+{"level":"error","message":"400 - Validation error: body.password: Required, body.role: Required, body.name: Required - /api/v1/auth/register - POST - ::1","service":"pai-care-api","timestamp":"2025-10-05 10:31:56"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:35:01"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:40:01"}
+{"code":"PGRST205","details":null,"hint":null,"level":"error","message":"Could not find the table 'public.reminders' in the schema cache","service":"pai-care-api","timestamp":"2025-10-05 10:45:00"}
+{"level":"error","message":"400 - Validation error: body.password: Required, body.role: Required, body.name: Required - /api/v1/auth/register - POST - ::1","service":"pai-care-api","timestamp":"2025-10-05 10:48:43"}
