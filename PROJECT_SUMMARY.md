@@ -8,8 +8,8 @@ A complete, production-ready backend API for a senior care management platform w
 
 ✅ **Authentication System**
 - JWT-based authentication with access & refresh tokens
-- Magic link authentication support
-- Password-based login
+- Magic-link only authentication (single-use, 15-minute links; no passwords in flows)
+- Automatic deletion of unverified users on expired verification
 - Role-based access control (4 roles: Senior, Caregiver, Institution Admin, Super Admin)
 
 ✅ **Senior Management**
@@ -114,13 +114,14 @@ pai-care-backend/
 
 ## API Endpoints
 
-### Authentication (6 endpoints)
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/login` - Login
+### Authentication (7 endpoints)
+- `POST /api/v1/auth/register` - Register by email (sends verify link)
+- `POST /api/v1/auth/login` - Login by email (sends sign-in link)
 - `POST /api/v1/auth/refresh` - Refresh tokens
-- `POST /api/v1/auth/magic-link` - Send magic link
+- `POST /api/v1/auth/magic-link` - Resend magic link
 - `POST /api/v1/auth/verify-magic-link` - Verify magic link
-- `GET /api/v1/auth/profile` - Get user profile
+- `GET  /api/v1/auth/verify?token=...` - Browser/mobile verification
+- `GET  /api/v1/auth/profile` - Get user profile
 
 ### Seniors (6 endpoints)
 - `GET /api/v1/seniors` - List seniors (paginated)
@@ -217,10 +218,10 @@ See **QUICKSTART.md** for detailed setup instructions.
 # Health check
 curl http://localhost:3000/health
 
-# Register a user
+# Register a user (magic-link)
 curl -X POST http://localhost:3000/api/v1/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"Pass123!","role":"senior","name":"John"}'
+  -d '{"email":"test@example.com"}'
 ```
 
 ### 3. Explore Documentation

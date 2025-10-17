@@ -241,8 +241,8 @@ idx_alerts_senior_resolved (senior_id, resolved_at)
 ```
 Registration/Login
        ↓
-Generate Access Token (7 days)
-Generate Refresh Token (30 days)
+Generate single-use magic link (15 minutes)
+On verify → issue Access Token (7 days) and Refresh Token (30 days)
        ↓
 Return both to client
        ↓
@@ -258,6 +258,16 @@ Controller/Service uses user.id, user.role
        ↓
 RLS policies enforce data access
 ```
+
+### Magic-Link Only Strategy
+
+- Users initiate register/login with an email address
+- Backend generates a single-use JWT (with `jti`) valid for 15 minutes and emails a link
+- Verification endpoints:
+  - GET `/api/v1/auth/verify?token=...` (browser/mobile friendly)
+  - POST `/api/v1/auth/verify-magic-link` with `{ token }`
+- On success: marks `users.email_verified = true`, consumes the `jti`, returns access and refresh tokens
+- On expiry: if the user is still unverified, the system deletes the user automatically
 
 ### Token Structure
 

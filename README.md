@@ -41,8 +41,7 @@ This backend API powers both platforms with:
 
 #### Authentication & Authorization
 - JWT token-based authentication
-- Magic link email authentication
-- Password-based login
+- Magic link email authentication (magic-link only; passwords removed from flows)
 - Refresh token support
 - Role-based permissions (Senior, Caregiver, Institution Admin, Super Admin)
 
@@ -243,21 +242,19 @@ Authorization: Bearer <your_jwt_token>
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/register` | Register new user | No |
-| POST | `/login` | Login with email/phone & password | No |
+| POST | `/register` | Register by email (sends verify link) | No |
+| POST | `/login` | Login by email (sends sign-in link) | No |
+| POST | `/magic-link` | Resend magic link to email | No |
+| GET  | `/verify?token=...` | Browser/mobile verification | No |
+| POST | `/verify-magic-link` | Verify token and get JWTs | No |
 | POST | `/refresh` | Refresh access token | No |
-| POST | `/magic-link` | Send magic link to email | No |
-| POST | `/verify-magic-link` | Verify magic link token | No |
-| GET | `/profile` | Get current user profile | Yes |
+| GET  | `/profile` | Get current user profile | Yes |
 
 **Register Example:**
-```json
+```http
 POST /api/v1/auth/register
 {
-  "email": "john@example.com",
-  "password": "SecurePass123!",
-  "role": "senior",
-  "name": "John Doe"
+  "email": "john@example.com"
 }
 
 Response:
@@ -266,19 +263,20 @@ Response:
   "message": "User registered successfully",
   "data": {
     "user": { "id": "...", "email": "...", "role": "senior" },
-    "token": "eyJhbGciOi...",
-    "refreshToken": "eyJhbGciOi..."
+    "pendingEmailVerification": true,
+    "magicLink": "http://localhost:3000/api/v1/auth/verify?token=..."
   }
 }
 ```
 
 **Login Example:**
-```json
+```http
 POST /api/v1/auth/login
 {
-  "email": "john@example.com",
-  "password": "SecurePass123!"
+  "email": "john@example.com"
 }
+
+Response: sends sign-in link email; returns { user, emailVerified, magicLink }
 ```
 
 #### Seniors Management (`/api/v1/seniors`)

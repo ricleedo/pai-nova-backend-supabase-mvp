@@ -195,9 +195,16 @@ Now that your backend is running, you can:
 
 ### Authentication
 - `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/login` - Login (email only, magic-link)
 - `POST /api/v1/auth/refresh` - Refresh token
 - `GET /api/v1/auth/profile` - Get profile (auth required)
+ - `POST /api/v1/auth/magic-link` - Resend magic link by email
+ - `POST /api/v1/auth/verify-magic-link` - Verify token and get JWTs
+ - `GET /api/v1/auth/verify?token=...` - Browser-friendly verification
+
+### Magic Link
+- `POST /api/v1/auth/magic-link` → body `{ "email": "user@example.com" }` to send an email
+- `POST /api/v1/auth/verify-magic-link` → body `{ "token": "..." }` to verify and get tokens
 
 ### Seniors
 - `GET /api/v1/seniors` - List seniors (auth required)
@@ -259,10 +266,18 @@ npm run format
 | `SUPABASE_ANON_KEY` | Yes | - | Supabase anonymous key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | - | Supabase service role key |
 | `JWT_SECRET` | Yes | - | Secret for signing JWT tokens |
+| `FRONTEND_URL` | Yes | http://localhost:3001 | Base URL used to build magic link |
+| `APP_NAME` | No | PAI Care | Used in email templates |
 | `PORT` | No | 3000 | Server port |
 | `NODE_ENV` | No | development | Environment (development/production) |
 | `JWT_EXPIRY` | No | 7d | Access token expiry |
 | `ENABLE_REMINDER_SCHEDULER` | No | true | Enable background jobs |
+| `SMTP_HOST` | For emails | - | SMTP server hostname |
+| `SMTP_PORT` | For emails | 587 | SMTP server port |
+| `SMTP_SECURE` | For emails | false | Use TLS (true for 465) |
+| `SMTP_USER` | For emails | - | SMTP username |
+| `SMTP_PASS` | For emails | - | SMTP password |
+| `SMTP_FROM` | For emails | no-reply@example.com | From address for emails |
 
 ---
 

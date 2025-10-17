@@ -164,6 +164,8 @@ CREATE TABLE IF NOT EXISTS users (
   phone text UNIQUE,
   role user_role NOT NULL DEFAULT 'senior',
   auth_provider auth_provider NOT NULL DEFAULT 'password',
+  email_verified boolean NOT NULL DEFAULT false,
+  password_hash text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -323,6 +325,16 @@ CREATE INDEX IF NOT EXISTS idx_dose_events_scheduled_at ON dose_events(scheduled
 CREATE INDEX IF NOT EXISTS idx_dose_events_status ON dose_events(status);
 CREATE INDEX IF NOT EXISTS idx_alerts_senior_id ON alerts(senior_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
+
+-- Magic link single-use tracking
+CREATE TABLE IF NOT EXISTS magic_link_uses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  jti text UNIQUE NOT NULL,
+  email text NOT NULL,
+  used_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_magic_link_uses_email ON magic_link_uses(email);
 
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;

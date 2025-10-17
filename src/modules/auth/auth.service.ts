@@ -4,6 +4,8 @@ import { supabaseAdmin } from '../../config/supabase';
 import { AppError } from '../../middleware/errorHandler';
 import logger from '../../config/logger';
 import { UserRole } from '../../types';
+import { sendMagicLinkEmail } from '../../services/email.service';
+import { randomUUID } from 'crypto';
 
 interface RegisterData {
   email?: string;
@@ -28,6 +30,73 @@ export class AuthService {
     );
   }
 
+  // Magic-link only registration: create user (if not exists) and send verify link
+  async magicRegister(email: string) {
+    if (!email) {
+      throw new AppError('Email is required', 400);
+    }
+
+    const { data: existing } = await supabaseAdmin
+      .from('users')
+      .select('id, email_verified, role')
+      .eq('email', email)
+      .maybeSingle();
+
+    let userId = existing?.id;
+    let role: UserRole = (existing?.role as UserRole) || 'senior';
+
+    if (!userId) {
+      const { data: created, error } = await supabaseAdmin
+        .from('users')
+        .insert({ email, role: 'senior', auth_provider: 'magic_link', email_verified: false })
+        .select('id, role')
+        .single();
+      if (error || !created) {
+        throw new AppError('Failed to create user', 500);
+      }
+      userId = created.id;
+      role = created.role as UserRole;
+    }
+
+    const { magicLink } = await this.generateMagicLink(email);
+
+    await supabaseAdmin.from('audit_logs').insert({
+      entity_type: 'user',
+      entity_id: userId,
+      action: 'magic_register_link_sent',
+      user_id: userId
+    });
+
+    return { user: { id: userId, email, role }, pendingEmailVerification: true, magicLink };
+  }
+
+  // Magic-link only login: require existing user; send sign-in link
+  async magicLogin(email: string) {
+    if (!email) {
+      throw new AppError('Email is required', 400);
+    }
+
+    const { data: user, error } = await supabaseAdmin
+      .from('users')
+      .select('id, email, role, email_verified')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (error || !user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const { magicLink } = await this.generateMagicLink(email);
+
+    await supabaseAdmin.from('audit_logs').insert({
+      entity_type: 'user',
+      entity_id: user.id,
+      action: 'magic_login_link_sent',
+      user_id: user.id
+    });
+
+    return { user: { id: user.id, email: user.email, role: user.role }, emailVerified: user.email_verified === true, magicLink };
+  }
   private generateRefreshToken(userId: string): string {
     return jwt.sign(
       { userId, type: 'refresh' },
@@ -37,37 +106,31 @@ export class AuthService {
   }
 
   async register(data: RegisterData) {
-    const { email, phone, password, role, name } = data;
+    const { email, password, role, name } = data;
 
-    if (!email && !phone) {
-      throw new AppError('Email or phone number is required', 400);
+    if (!email) {
+      throw new AppError('Email is required', 400);
     }
 
-    const existingUserQuery = supabaseAdmin
+    const { data: existingUser } = await supabaseAdmin
       .from('users')
-      .select('id');
-
-    if (email) {
-      existingUserQuery.eq('email', email);
-    } else if (phone) {
-      existingUserQuery.eq('phone', phone);
-    }
-
-    const { data: existingUser } = await existingUserQuery.maybeSingle();
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
 
     if (existingUser) {
       throw new AppError('User already exists', 409);
     }
 
-    await bcrypt.hash(password, 12);
+    const passwordHash = await bcrypt.hash(password, 12);
 
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         email,
-        phone,
         role,
-        auth_provider: 'password'
+        auth_provider: 'password',
+        password_hash: passwordHash
       })
       .select()
       .single();
@@ -105,9 +168,6 @@ export class AuthService {
       }
     }
 
-    const token = this.generateToken(user.id, user.role, user.email);
-    const refreshToken = this.generateRefreshToken(user.id);
-
     await supabaseAdmin
       .from('audit_logs')
       .insert({
@@ -117,64 +177,46 @@ export class AuthService {
         user_id: user.id,
         changes: { role, auth_provider: 'password' }
       });
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        role: user.role
-      },
-      token,
-      refreshToken
-    };
+    // Immediately send magic link for email verification/sign-in
+    await this.generateMagicLink(email!);
+    return { user: { id: user.id, email: user.email, role: user.role }, pendingEmailVerification: true };
   }
 
   async login(data: LoginData) {
-    const { email, phone } = data;
+    const { email, password } = data;
 
-    if (!email && !phone) {
-      throw new AppError('Email or phone number is required', 400);
+    if (!email) {
+      throw new AppError('Email is required', 400);
     }
 
-    const query = supabaseAdmin
+    const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('id, email, phone, role');
-
-    if (email) {
-      query.eq('email', email);
-    } else if (phone) {
-      query.eq('phone', phone);
-    }
-
-    const { data: user, error } = await query.maybeSingle();
+      .select('id, email, role, password_hash, email_verified')
+      .eq('email', email)
+      .maybeSingle();
 
     if (error || !user) {
-      throw new AppError('Invalid credentials', 401);
+      throw new AppError('User not found', 404);
     }
 
-    const token = this.generateToken(user.id, user.role, user.email);
-    const refreshToken = this.generateRefreshToken(user.id);
+    const ok = user.password_hash ? await bcrypt.compare(password, user.password_hash) : false;
+    if (!ok) {
+      throw new AppError('Wrong password', 401);
+    }
+
+    // Send a magic link to complete login/verification each time
+    await this.generateMagicLink(email);
 
     await supabaseAdmin
       .from('audit_logs')
       .insert({
         entity_type: 'user',
         entity_id: user.id,
-        action: 'login',
+        action: 'login_magic_link_sent',
         user_id: user.id
       });
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        role: user.role
-      },
-      token,
-      refreshToken
-    };
+    return { user: { id: user.id, email: user.email, role: user.role }, emailVerified: user.email_verified === true };
   }
 
   async refreshToken(refreshToken: string) {
@@ -208,27 +250,56 @@ export class AuthService {
   }
 
   async generateMagicLink(email: string) {
-    const { data: user } = await supabaseAdmin
+    // Upsert user by email; default role senior and auth_provider magic_link if created
+    const { data: existing } = await supabaseAdmin
       .from('users')
-      .select('id')
+      .select('id, role')
       .eq('email', email)
       .maybeSingle();
 
-    if (!user) {
-      throw new AppError('User not found', 404);
+    let userId = existing?.id;
+    let role: UserRole = (existing?.role as UserRole) || 'senior';
+
+    if (!userId) {
+      const { data: created, error: insertErr } = await supabaseAdmin
+        .from('users')
+        .insert({ email, role: 'senior', auth_provider: 'magic_link' })
+        .select('id, role')
+        .single();
+      if (insertErr || !created) {
+        logger.error('Failed to create user for magic link:', insertErr);
+        throw new AppError('Failed to create user', 500);
+      }
+      userId = created.id;
+      role = created.role as UserRole;
     }
 
+    const jti = randomUUID();
     const token = jwt.sign(
-      { userId: user.id, type: 'magic_link' },
+      { userId, type: 'magic_link', email, jti },
       process.env.JWT_SECRET!,
       { expiresIn: '15m' }
     );
 
-    const magicLink = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
+    // Persist JTI for single-use enforcement
+    await supabaseAdmin
+      .from('magic_link_uses')
+      .insert({ jti, email });
 
-    logger.info(`Magic link generated for ${email}: ${magicLink}`);
+    const frontendLink = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
+    const backendLink = `${process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`}/api/${process.env.API_VERSION || 'v1'}/auth/verify?token=${token}`;
 
-    return { magicLink };
+    try {
+      const purpose = existing ? 'signin' : 'verify';
+      await sendMagicLinkEmail({ to: email, frontendLink, backendLink, purpose: purpose as any });
+    } catch (err) {
+      logger.error('Failed to send magic link email:', err);
+      // Still return the link for testing purposes when email fails
+      return { sent: false, magicLink: backendLink };
+    }
+
+    logger.info(`Magic link issued for ${email}`);
+    return { sent: true, magicLink: backendLink };
   }
 
   async verifyMagicLink(token: string) {
@@ -239,9 +310,22 @@ export class AuthService {
         throw new AppError('Invalid magic link', 401);
       }
 
+      // Enforce single-use by checking jti not used
+      const { data: ml, error: mlErr } = await supabaseAdmin
+        .from('magic_link_uses')
+        .select('id, used_at')
+        .eq('jti', decoded.jti)
+        .maybeSingle();
+      if (mlErr || !ml) {
+        throw new AppError('Invalid magic link', 401);
+      }
+      if (ml.used_at) {
+        throw new AppError('Magic link already used', 401);
+      }
+
       const { data: user, error } = await supabaseAdmin
         .from('users')
-        .select('id, email, role')
+        .select('id, email, role, email_verified')
         .eq('id', decoded.userId)
         .maybeSingle();
 
@@ -249,15 +333,42 @@ export class AuthService {
         throw new AppError('User not found', 404);
       }
 
+      // mark email verified and consume magic link
+      await Promise.all([
+        supabaseAdmin
+          .from('users')
+          .update({ email_verified: true, auth_provider: 'magic_link' })
+          .eq('id', decoded.userId),
+        supabaseAdmin
+          .from('magic_link_uses')
+          .update({ used_at: new Date().toISOString() })
+          .eq('jti', decoded.jti)
+      ]);
+
       const accessToken = this.generateToken(user.id, user.role, user.email);
       const refreshToken = this.generateRefreshToken(user.id);
 
       return {
-        user,
+        user: { id: user.id, email: user.email, role: user.role },
         token: accessToken,
         refreshToken
       };
     } catch (error) {
+      // If token expired, delete unverified user automatically as requested
+      const err: any = error;
+      if (err && err.name === 'TokenExpiredError') {
+        const decoded: any = jwt.decode(token);
+        if (decoded?.userId) {
+          const { data: user } = await supabaseAdmin
+            .from('users')
+            .select('id, email_verified')
+            .eq('id', decoded.userId)
+            .maybeSingle();
+          if (user && user.email_verified !== true) {
+            await supabaseAdmin.from('users').delete().eq('id', decoded.userId);
+          }
+        }
+      }
       throw new AppError('Invalid or expired magic link', 401);
     }
   }

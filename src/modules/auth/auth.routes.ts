@@ -8,23 +8,13 @@ const router = Router();
 
 const registerSchema = z.object({
   body: z.object({
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    password: z.string().min(8),
-    role: z.enum(['senior', 'caregiver', 'institution_admin', 'super_admin']),
-    name: z.string().min(1)
-  }).refine(data => data.email || data.phone, {
-    message: 'Either email or phone is required'
+    email: z.string().email()
   })
 });
 
 const loginSchema = z.object({
   body: z.object({
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    password: z.string()
-  }).refine(data => data.email || data.phone, {
-    message: 'Either email or phone is required'
+    email: z.string().email()
   })
 });
 
@@ -51,6 +41,8 @@ router.post('/login', validate(loginSchema), authController.login);
 router.post('/refresh', validate(refreshTokenSchema), authController.refreshToken);
 router.post('/magic-link', validate(magicLinkSchema), authController.sendMagicLink);
 router.post('/verify-magic-link', validate(verifyMagicLinkSchema), authController.verifyMagicLink);
+// Backend-friendly GET verification (for email button clicks)
+router.get('/verify', authController.verifyMagicLink);
 router.get('/profile', authenticateToken, authController.getProfile);
 
 export default router;
