@@ -691,3 +691,15 @@
 {"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-23 13:10:00"}
 {"level":"info","message":"Processed 0 reminders","service":"pai-care-api","timestamp":"2025-10-23 13:10:00"}
 {"level":"info","message":"Shutting down gracefully...","service":"pai-care-api","timestamp":"2025-10-23 13:14:06"}
+{"level":"info","message":"Server is running on port 3000","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Environment: development","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"API Version: v1","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Starting scheduler service","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Scheduled reminder check job (every 5 minutes)","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Scheduled missed dose check job (every hour)","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Scheduled daily alert generation (midnight)","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Scheduler service started","service":"pai-care-api","timestamp":"2025-10-23 15:59:14"}
+{"level":"info","message":"Checking for upcoming reminders...","service":"pai-care-api","timestamp":"2025-10-23 16:00:00"}
+{"level":"info","message":"Checking for missed doses...","service":"pai-care-api","timestamp":"2025-10-23 16:00:00"}
+{"level":"info","message":"Found 0 missed doses","service":"pai-care-api","timestamp":"2025-10-23 16:00:01"}
+{"level":"info","message":"Processed 0 reminders","service":"pai-care-api","timestamp":"2025-10-23 16:00:01"}
