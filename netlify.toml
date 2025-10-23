@@ -1,5 +1,6 @@
 [build]
-  functions = "functions"  # path to your Netlify functions folder
+  command = "npm run build"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
