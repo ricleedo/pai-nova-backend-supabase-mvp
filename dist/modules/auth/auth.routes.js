@@ -11,22 +11,12 @@ const zod_1 = require("zod");
 const router = (0, express_1.Router)();
 const registerSchema = zod_1.z.object({
     body: zod_1.z.object({
-        email: zod_1.z.string().email().optional(),
-        phone: zod_1.z.string().optional(),
-        password: zod_1.z.string().min(8),
-        role: zod_1.z.enum(['senior', 'caregiver', 'institution_admin', 'super_admin']),
-        name: zod_1.z.string().min(1)
-    }).refine(data => data.email || data.phone, {
-        message: 'Either email or phone is required'
+        email: zod_1.z.string().email()
     })
 });
 const loginSchema = zod_1.z.object({
     body: zod_1.z.object({
-        email: zod_1.z.string().email().optional(),
-        phone: zod_1.z.string().optional(),
-        password: zod_1.z.string()
-    }).refine(data => data.email || data.phone, {
-        message: 'Either email or phone is required'
+        email: zod_1.z.string().email()
     })
 });
 const magicLinkSchema = zod_1.z.object({
@@ -49,6 +39,8 @@ router.post('/login', (0, validator_1.validate)(loginSchema), auth_controller_1.
 router.post('/refresh', (0, validator_1.validate)(refreshTokenSchema), auth_controller_1.default.refreshToken);
 router.post('/magic-link', (0, validator_1.validate)(magicLinkSchema), auth_controller_1.default.sendMagicLink);
 router.post('/verify-magic-link', (0, validator_1.validate)(verifyMagicLinkSchema), auth_controller_1.default.verifyMagicLink);
+// Backend-friendly GET verification (for email button clicks)
+router.get('/verify', auth_controller_1.default.verifyMagicLink);
 router.get('/profile', auth_1.authenticateToken, auth_controller_1.default.getProfile);
 exports.default = router;
 //# sourceMappingURL=auth.routes.js.map

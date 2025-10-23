@@ -8,7 +8,7 @@ const auth_service_1 = __importDefault(require("./auth.service"));
 const errorHandler_1 = require("../../middleware/errorHandler");
 class AuthController {
     register = (0, errorHandler_1.asyncHandler)(async (req, res) => {
-        const result = await auth_service_1.default.register(req.body);
+        const result = await auth_service_1.default.magicRegister(req.body.email);
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
@@ -16,7 +16,7 @@ class AuthController {
         });
     });
     login = (0, errorHandler_1.asyncHandler)(async (req, res) => {
-        const result = await auth_service_1.default.login(req.body);
+        const result = await auth_service_1.default.magicLogin(req.body.email);
         res.status(200).json({
             success: true,
             message: 'Login successful',
@@ -42,13 +42,22 @@ class AuthController {
         });
     });
     verifyMagicLink = (0, errorHandler_1.asyncHandler)(async (req, res) => {
-        const { token } = req.body;
+        const token = (req.method === 'GET') ? req.query.token : req.body.token;
         const result = await auth_service_1.default.verifyMagicLink(token);
-        res.status(200).json({
-            success: true,
-            message: 'Magic link verified successfully',
-            data: result
-        });
+        if (req.method === 'GET') {
+            // Simple HTML response for convenience when clicking from email
+            res.status(200).send(`<!doctype html><html><body>
+        <h2>Verification successful</h2>
+        <p>You can return to the app now.</p>
+      </body></html>`);
+        }
+        else {
+            res.status(200).json({
+                success: true,
+                message: 'Magic link verified successfully',
+                data: result
+            });
+        }
     });
     getProfile = (0, errorHandler_1.asyncHandler)(async (req, res) => {
         const user = req.user;

@@ -43,7 +43,7 @@ export class AuthService {
       .maybeSingle();
 
     let userId = existing?.id;
-    let role: UserRole = (existing?.role as UserRole) || 'senior';
+    const userRole: UserRole = (existing?.role as UserRole) || 'senior';
 
     if (!userId) {
       const { data: created, error } = await supabaseAdmin
@@ -55,7 +55,6 @@ export class AuthService {
         throw new AppError('Failed to create user', 500);
       }
       userId = created.id;
-      role = created.role as UserRole;
     }
 
     const { magicLink } = await this.generateMagicLink(email);
@@ -67,7 +66,7 @@ export class AuthService {
       user_id: userId
     });
 
-    return { user: { id: userId, email, role }, pendingEmailVerification: true, magicLink };
+    return { user: { id: userId, email, role: userRole }, pendingEmailVerification: true, magicLink };
   }
 
   // Magic-link only login: require existing user; send sign-in link
@@ -258,7 +257,6 @@ export class AuthService {
       .maybeSingle();
 
     let userId = existing?.id;
-    let role: UserRole = (existing?.role as UserRole) || 'senior';
 
     if (!userId) {
       const { data: created, error: insertErr } = await supabaseAdmin
@@ -271,7 +269,6 @@ export class AuthService {
         throw new AppError('Failed to create user', 500);
       }
       userId = created.id;
-      role = created.role as UserRole;
     }
 
     const jti = randomUUID();

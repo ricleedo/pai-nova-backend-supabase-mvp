@@ -13,32 +13,47 @@ interface LoginData {
 }
 export declare class AuthService {
     private generateToken;
+    magicRegister(email: string): Promise<{
+        user: {
+            id: any;
+            email: string;
+            role: UserRole;
+        };
+        pendingEmailVerification: boolean;
+        magicLink: string;
+    }>;
+    magicLogin(email: string): Promise<{
+        user: {
+            id: any;
+            email: any;
+            role: any;
+        };
+        emailVerified: boolean;
+        magicLink: string;
+    }>;
     private generateRefreshToken;
     register(data: RegisterData): Promise<{
         user: {
             id: any;
             email: any;
-            phone: any;
             role: any;
         };
-        token: string;
-        refreshToken: string;
+        pendingEmailVerification: boolean;
     }>;
     login(data: LoginData): Promise<{
         user: {
             id: any;
             email: any;
-            phone: any;
             role: any;
         };
-        token: string;
-        refreshToken: string;
+        emailVerified: boolean;
     }>;
     refreshToken(refreshToken: string): Promise<{
         token: string;
         refreshToken: string;
     }>;
     generateMagicLink(email: string): Promise<{
+        sent: boolean;
         magicLink: string;
     }>;
     verifyMagicLink(token: string): Promise<{
