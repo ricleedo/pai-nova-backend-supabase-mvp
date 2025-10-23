@@ -3,7 +3,7 @@ const serverless = require('serverless-http');
 const app = express();
 
 // Import your route handlers from src
-const Routes = require('../src/server.ts'); // adjust path as needed
+const Routes = require('../dist/server.js')
 
 app.use('/api', Routes);
 

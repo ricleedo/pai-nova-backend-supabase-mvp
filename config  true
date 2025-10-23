@@ -1,0 +1,22 @@
+[35mARCHITECTURE.md[m[36m:[m[32m473[m[36m:[mprocess.env.[1;31mSUPABASE_SERVICE_ROLE_KEY[m  // Never in code
+[35mQUICKSTART.md[m[36m:[m[32m21[m[36m:[m   - `Project URL` → This is your `[1;31mSUPABASE_URL[m`
+[35mQUICKSTART.md[m[36m:[m[32m22[m[36m:[m   - `anon public` key → This is your `[1;31mSUPABASE_ANON_KEY[m`
+[35mQUICKSTART.md[m[36m:[m[32m23[m[36m:[m   - `service_role secret` key → This is your `[1;31mSUPABASE_SERVICE_ROLE_KEY[m`
+[35mQUICKSTART.md[m[36m:[m[32m36[m[36m:[m   [1;31mSUPABASE_URL[m=https://your-project.supabase.co
+[35mQUICKSTART.md[m[36m:[m[32m37[m[36m:[m   [1;31mSUPABASE_ANON_KEY[m=your_anon_key_here
+[35mQUICKSTART.md[m[36m:[m[32m38[m[36m:[m   [1;31mSUPABASE_SERVICE_ROLE_KEY[m=your_service_role_key_here
+[35mQUICKSTART.md[m[36m:[m[32m265[m[36m:[m| `[1;31mSUPABASE_URL[m` | Yes | - | Your Supabase project URL |
+[35mQUICKSTART.md[m[36m:[m[32m266[m[36m:[m| `[1;31mSUPABASE_ANON_KEY[m` | Yes | - | Supabase anonymous key |
+[35mQUICKSTART.md[m[36m:[m[32m267[m[36m:[m| `[1;31mSUPABASE_SERVICE_ROLE_KEY[m` | Yes | - | Supabase service role key |
+[35mREADME.md[m[36m:[m[32m185[m[36m:[m   [1;31mSUPABASE_URL[m=https://your-project.supabase.co
+[35mREADME.md[m[36m:[m[32m186[m[36m:[m   [1;31mSUPABASE_ANON_KEY[m=your_anon_key
+[35mREADME.md[m[36m:[m[32m187[m[36m:[m   [1;31mSUPABASE_SERVICE_ROLE_KEY[m=your_service_role_key
+[35mREADME.md[m[36m:[m[32m587[m[36m:[m✅ [1;31mSUPABASE_URL[m
+[35mREADME.md[m[36m:[m[32m588[m[36m:[m✅ [1;31mSUPABASE_ANON_KEY[m
+[35mREADME.md[m[36m:[m[32m589[m[36m:[m✅ [1;31mSUPABASE_SERVICE_ROLE_KEY[m
+[35mdist/config/supabase.js[m[36m:[m[32m10[m[36m:[mconst supabaseUrl = process.env.[1;31mSUPABASE_URL[m;
+[35mdist/config/supabase.js[m[36m:[m[32m11[m[36m:[mconst supabaseServiceKey = process.env.[1;31mSUPABASE_SERVICE_ROLE_KEY[m;
+[35mdist/config/supabase.js[m[36m:[m[32m12[m[36m:[mconst supabaseAnonKey = process.env.[1;31mSUPABASE_ANON_KEY[m;
+[35msrc/config/supabase.ts[m[36m:[m[32m6[m[36m:[mconst supabaseUrl = process.env.[1;31mSUPABASE_URL[m!;
+[35msrc/config/supabase.ts[m[36m:[m[32m7[m[36m:[mconst supabaseServiceKey = process.env.[1;31mSUPABASE_SERVICE_ROLE_KEY[m!;
+[35msrc/config/supabase.ts[m[36m:[m[32m8[m[36m:[mconst supabaseAnonKey = process.env.[1;31mSUPABASE_ANON_KEY[m!;
